@@ -205,7 +205,7 @@ const Hero = () => {
               }}
             >
               <Image
-                src="/subject.png"
+                src="/Subject.png"
                 alt="Rudra Sahoo"
                 fill
                 className="object-contain object-right"
