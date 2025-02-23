@@ -48,14 +48,17 @@ export default function Work() {
     return [1, '...', current - 1, current, current + 1, '...', total];
   };
 
-  // Scroll animations
+  // Enhanced scroll animations
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"]
   })
 
-  const backgroundOpacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 0.05, 0.05, 0])
-  const backgroundX = useTransform(scrollYProgress, [0, 1], [50, -50])
+  const backgroundOpacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 0.08, 0.08, 0])
+  const backgroundX = useTransform(scrollYProgress, [0, 1], [100, -100])
+  const backgroundScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.8, 1, 1.2])
+  const backgroundRotate = useTransform(scrollYProgress, [0, 1], [-5, 5])
+  const backgroundY = useTransform(scrollYProgress, [0, 0.5, 1], [-50, 0, 50])
 
   const [ref, inView] = useInView({
     threshold: 0.1,
@@ -217,217 +220,229 @@ export default function Work() {
     <section 
       ref={sectionRef}
       id="work" 
-      className="min-h-screen relative py-32 bg-black/95"
+      className="min-h-screen relative py-32 bg-gradient-to-b from-black/95 to-black/90"
     >
+      {/* Enhanced background text */}
       <motion.div 
-        className="frame-text absolute top-20 right-10 text-[12rem] md:text-[16rem] font-bold"
+        className="frame-text absolute top-20 right-10 text-[12rem] md:text-[16rem] font-bold opacity-0"
         style={{ 
           opacity: backgroundOpacity,
-          x: backgroundX
+          x: backgroundX,
+          scale: backgroundScale,
+          rotate: backgroundRotate,
+          y: backgroundY,
         }}
       >
         WORK
       </motion.div>
 
       <div className="container mx-auto px-4">
+        {/* Enhanced header animations */}
         <motion.div
           initial={{ y: 50, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-primary/60">
+          <h2 className="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-primary/60">
             Featured Projects
           </h2>
           <motion.div 
-            className="h-1 w-0 bg-primary rounded-full mx-auto mb-6"
+            className="h-1 w-0 bg-gradient-to-r from-primary via-primary/80 to-primary/60 rounded-full mx-auto mb-6"
             initial={{ width: 0 }}
-            whileInView={{ width: 80 }}
+            whileInView={{ width: 120 }}
             viewport={{ once: true }}
-            transition={{ duration: 1, delay: 0.3 }}
+            transition={{ duration: 1.5, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
           />
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             A showcase of my open-source projects and contributions.
           </p>
         </motion.div>
 
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...Array(reposPerPage)].map((_, i) => (
+        {/* Enhanced project cards */}
+        {!isLoading && (
+          <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {repos.map((repo, index) => (
               <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="bg-card/10 rounded-2xl p-6 h-[300px] animate-pulse"
+                key={repo.name}
+                initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                animate={inView ? { 
+                  opacity: 1, 
+                  y: 0, 
+                  scale: 1,
+                  transition: {
+                    duration: 0.8,
+                    delay: index * 0.1,
+                    ease: [0.16, 1, 0.3, 1]
+                  }
+                } : {}}
+                className="group relative bg-card/10 backdrop-blur-sm rounded-2xl p-6 border border-primary/10 hover:border-primary/30 transition-all duration-300 cursor-pointer"
+                onMouseEnter={() => setHoveredCard(repo.name)}
+                onMouseLeave={() => setHoveredCard(null)}
+                onClick={() => {
+                  setSelectedRepo(repo)
+                  fetchLanguages(repo.languages_url)
+                }}
+                whileHover={{ 
+                  y: -8,
+                  scale: 1.02,
+                  transition: { duration: 0.3, ease: "easeOut" }
+                }}
               >
-                <div className="h-4 bg-primary/10 rounded w-3/4 mb-4" />
-                <div className="h-20 bg-primary/5 rounded mb-4" />
-                <div className="flex gap-2">
-                  <div className="h-3 bg-primary/10 rounded w-16" />
-                  <div className="h-3 bg-primary/10 rounded w-16" />
+                {/* Enhanced hover effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl opacity-0"
+                  initial={false}
+                  animate={{
+                    opacity: hoveredCard === repo.name ? 1 : 0
+                  }}
+                  transition={{ duration: 0.3 }}
+                />
+
+                {/* Enhanced card content */}
+                <div className="relative z-10">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <motion.h3 
+                        className="text-xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/90 group-hover:from-primary group-hover:to-primary/80"
+                        transition={{ duration: 0.3 }}
+                      >
+                        {repo.name}
+                      </motion.h3>
+                      <p className="text-muted-foreground text-sm line-clamp-2 group-hover:text-primary/80 transition-colors">
+                        {repo.description || "No description available"}
+                      </p>
+                    </div>
+                    <motion.div
+                      whileHover={{ rotate: 15, scale: 1.1 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                    >
+                      <Code2 className="w-6 h-6 text-primary opacity-50 group-hover:opacity-100 transition-all" />
+                    </motion.div>
+                  </div>
+
+                  {/* Enhanced stats display */}
+                  <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
+                    {repo.language && (
+                      <motion.div 
+                        className="flex items-center gap-1.5"
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        <span 
+                          className="w-3 h-3 rounded-full ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all"
+                          style={{ backgroundColor: languageColors[repo.language] || '#ddd' }}
+                        />
+                        {repo.language}
+                      </motion.div>
+                    )}
+                    <motion.div 
+                      className="flex items-center gap-1.5"
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      <Star className="w-4 h-4" />
+                      {repo.stargazers_count}
+                    </motion.div>
+                    <motion.div 
+                      className="flex items-center gap-1.5"
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      <GitFork className="w-4 h-4" />
+                      {repo.forks_count}
+                    </motion.div>
+                  </div>
                 </div>
               </motion.div>
             ))}
           </div>
-        ) : (
-          <>
-            <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {repos.map((repo, index) => (
-                <motion.div
-                  key={repo.name}
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={inView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="group relative bg-card/10 backdrop-blur-sm rounded-2xl p-6 border border-primary/10 hover:border-primary/30 transition-all cursor-pointer"
-                  style={{ cursor: 'pointer' }}
-                  onMouseEnter={() => setHoveredCard(repo.name)}
-                  onMouseLeave={() => setHoveredCard(null)}
-                  onClick={() => {
-                    setSelectedRepo(repo)
-                    fetchLanguages(repo.languages_url)
-                  }}
-                  whileHover={{ y: -5 }}
-                >
-                  <motion.div
-                    className="absolute inset-0 bg-primary/5 rounded-2xl"
-                    initial={false}
-                    animate={{
-                      opacity: hoveredCard === repo.name ? 1 : 0
-                    }}
-                    transition={{ duration: 0.3 }}
-                  />
-
-                  <div className="relative z-10">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                          {repo.name}
-                        </h3>
-                        <p className="text-muted-foreground text-sm line-clamp-2">
-                          {repo.description || "No description available"}
-                        </p>
-                      </div>
-                      <Code2 className="w-6 h-6 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
-                    </div>
-
-                    <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
-                      {repo.language && (
-                        <div className="flex items-center gap-1.5">
-                          <span 
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: languageColors[repo.language] || '#ddd' }}
-                          />
-                          {repo.language}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-1.5">
-                        <Star className="w-4 h-4" />
-                        {repo.stargazers_count}
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <GitFork className="w-4 h-4" />
-                        {repo.forks_count}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-            
-            {/* Add pagination controls */}
-            <PaginationControls />
-          </>
         )}
-      </div>
 
-      {/* Updated Repository Details Modal */}
-      <AnimatePresence>
-        {selectedRepo && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setSelectedRepo(null)}
-            style={{ cursor: 'pointer' }}
-          >
+        {/* Enhanced modal animations */}
+        <AnimatePresence>
+          {selectedRepo && (
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ type: "spring", duration: 0.5 }}
-              className="bg-card/95 backdrop-blur-md w-full max-w-2xl rounded-2xl p-6 shadow-xl border border-primary/10"
-              onClick={e => e.stopPropagation()}
-              style={{ cursor: 'default' }}
+              initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+              animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
+              exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+              className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+              onClick={() => setSelectedRepo(null)}
             >
-              <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl font-bold">{selectedRepo.name}</h2>
-                <div className="flex gap-2">
-                  {selectedRepo.homepage && (
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                transition={{ type: "spring", duration: 0.7, bounce: 0.3 }}
+                className="bg-gradient-to-br from-card/95 to-card/90 backdrop-blur-xl w-full max-w-2xl rounded-2xl p-8 shadow-xl border border-primary/10"
+                onClick={e => e.stopPropagation()}
+              >
+                <div className="flex justify-between items-start mb-6">
+                  <h2 className="text-2xl font-bold text-primary">{selectedRepo.name}</h2>
+                  <div className="flex gap-2">
+                    {selectedRepo.homepage && (
+                      <Link 
+                        href={selectedRepo.homepage}
+                        target="_blank"
+                        className="p-2 rounded-lg hover:bg-primary/10 transition-colors"
+                      >
+                        <ExternalLink className="w-5 h-5" />
+                      </Link>
+                    )}
                     <Link 
-                      href={selectedRepo.homepage}
+                      href={selectedRepo.html_url}
                       target="_blank"
                       className="p-2 rounded-lg hover:bg-primary/10 transition-colors"
-                      style={{ cursor: 'pointer' }}
                     >
-                      <ExternalLink className="w-5 h-5" />
+                      <Github className="w-5 h-5" />
                     </Link>
-                  )}
-                  <Link 
-                    href={selectedRepo.html_url}
-                    target="_blank"
-                    className="p-2 rounded-lg hover:bg-primary/10 transition-colors"
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <Github className="w-5 h-5" />
-                  </Link>
-                </div>
-              </div>
-
-              <p className="text-muted-foreground mb-6">
-                {selectedRepo.description}
-              </p>
-
-              {Object.keys(languages).length > 0 && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <Activity className="w-5 h-5" />
-                    Language Distribution
-                  </h3>
-                  <div className="h-2 rounded-full bg-primary/10 overflow-hidden flex">
-                    {calculatePercentages(languages).map(({ name, percentage }, index) => (
-                      <motion.div
-                        key={name}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${percentage}%` }}
-                        transition={{ duration: 0.8, delay: index * 0.1 }}
-                        style={{ 
-                          backgroundColor: languageColors[name] || '#ddd',
-                        }}
-                        className="h-full first:rounded-l-full last:rounded-r-full"
-                      />
-                    ))}
                   </div>
-                  <div className="flex flex-wrap gap-4">
-                    {calculatePercentages(languages).map(({ name, percentage }) => (
-                      <div key={name} className="flex items-center gap-2">
-                        <span 
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: languageColors[name] || '#ddd' }}
+                </div>
+
+                <p className="text-muted-foreground mb-6">
+                  {selectedRepo.description}
+                </p>
+
+                {Object.keys(languages).length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                      <Activity className="w-5 h-5" />
+                      Language Distribution
+                    </h3>
+                    <div className="h-2 rounded-full bg-primary/10 overflow-hidden flex">
+                      {calculatePercentages(languages).map(({ name, percentage }, index) => (
+                        <motion.div
+                          key={name}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${percentage}%` }}
+                          transition={{ duration: 0.8, delay: index * 0.1 }}
+                          style={{ 
+                            backgroundColor: languageColors[name] || '#ddd',
+                          }}
+                          className="h-full first:rounded-l-full last:rounded-r-full"
                         />
-                        <span>{name}</span>
-                        <span className="text-muted-foreground">{percentage}%</span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap gap-4">
+                      {calculatePercentages(languages).map(({ name, percentage }) => (
+                        <div key={name} className="flex items-center gap-2">
+                          <span 
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: languageColors[name] || '#ddd' }}
+                          />
+                          <span>{name}</span>
+                          <span className="text-muted-foreground">{percentage}%</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+
+        {/* Enhanced pagination controls */}
+        <PaginationControls />
+      </div>
     </section>
   )
 }

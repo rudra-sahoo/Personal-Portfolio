@@ -24,6 +24,12 @@ export default function About() {
     offset: ["start 0.8", "start 0.2"]
   })
   
+  // Enhanced background text animation
+  const backgroundRotate = useTransform(scrollYProgress, [0, 0.5, 1], [-10, 0, 10])
+  const backgroundY = useTransform(scrollYProgress, [0, 0.5, 1], [-50, 0, 50])
+  const letterSpacing = useTransform(scrollYProgress, [0, 0.5, 1], ["0px", "15px", "0px"])
+  const backgroundSkew = useTransform(scrollYProgress, [0, 0.5, 1], [-5, 0, 5])
+  
   // Optimize transform values with fewer keyframes and easing
   const backgroundOpacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 0.05, 0.05, 0])
   const backgroundX = useTransform(scrollYProgress, [0, 1], [-50, 50]) // Reduced movement range
@@ -59,11 +65,10 @@ export default function About() {
     setIsClient(true)
   }, [])
 
+  // Updated stats array
   const stats = [
-    { number: "20+", label: "Projects Completed" },
-    { number: "5+", label: "Years Experience" },
-    { number: "10+", label: "Happy Clients" },
-    { number: "2+", label: "Startup Founded" }
+    { number: "5+", label: "Projects Completed" },
+    { number: "1+", label: "Years Experience" }
   ]
   
   // Handle intersection animations
@@ -98,9 +103,12 @@ export default function About() {
             opacity: backgroundOpacity,
             x: backgroundX,
             scale: backgroundScale,
+            rotate: backgroundRotate,
+            y: backgroundY,
+            letterSpacing
           }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.05 }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 0.05, scale: 1 }}
           transition={{ duration: 1.5, delay: 0.2 }}
         >
           ABOUT ME
@@ -231,12 +239,12 @@ export default function About() {
                     transition={{ duration: 0.8, delay: 0.3 }}
                   >
                     A passionate developer from Odisha, India, currently leading innovation at DuckBuck Studios. 
-                    With a vision to revolutionize digital experiences, I'm developing{" "}
+                    With a vision to revolutionize digital communication, I'm developing{" "}
                     <Link href="https://duckbuck.in" className="text-primary relative group inline-flex items-center" target="_blank">
                       <span>DuckBuck</span>
                       <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-500 ease-out"></span>
                     </Link>
-                    , a platform that's reshaping the future of digital interactions.
+                    , a real-time voice communication platform that enables users to communicate like walkie-talkies over the internet.
                   </motion.p>
                   
                   <motion.p 
@@ -252,34 +260,40 @@ export default function About() {
                 </motion.div>
               </motion.div>
 
-              {/* Stats with staggered animations */}
+              {/* Stats with enhanced staggered animations */}
               <motion.div
                 ref={statsRef}
                 style={statsInView ? { y: statsY } : {}}
-                className="grid grid-cols-2 gap-4 will-change-transform"
+                className="grid grid-cols-2 gap-6 will-change-transform"
               >
                 {stats.map((stat, index) => (
                   <motion.div
                     key={index}
                     className="p-6 rounded-xl bg-primary/5 backdrop-blur-sm border border-primary/10 transition-all transform-gpu"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={statsInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ 
-                      duration: 0.5, 
-                      delay: 0.2 + index * 0.1,
-                      ease: [0.25, 0.1, 0.25, 1]
-                    }}
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={statsInView ? { 
+                      opacity: 1, 
+                      y: 0, 
+                      scale: 1,
+                      transition: {
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 20,
+                        delay: index * 0.2
+                      }
+                    } : {}}
                     whileHover={{ 
                       y: -5,
-                      boxShadow: "0 15px 30px -10px rgba(var(--primary-rgb), 0.2)",
-                      borderColor: "rgba(var(--primary-rgb), 0.25)"
+                      scale: 1.05,
+                      boxShadow: "0 20px 40px -20px rgba(var(--primary-rgb), 0.3)",
+                      borderColor: "rgba(var(--primary-rgb), 0.4)"
                     }}
-                    whileTap={{ y: -2 }} // Add tactile feedback
+                    whileTap={{ scale: 0.98, y: -2 }}
                   >
                     <motion.h3 
                       className="text-3xl font-bold mb-2 text-primary"
-                      whileHover={{ scale: 1.05, x: 2 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                      whileHover={{ scale: 1.1, x: 3 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
                     >
                       {stat.number}
                     </motion.h3>

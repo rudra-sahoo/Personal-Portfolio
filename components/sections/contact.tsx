@@ -7,7 +7,7 @@ import { Send, Phone, Mail, MapPin, Loader2 } from "lucide-react"
 import emailjs from '@emailjs/browser'
 
 // Initialize EmailJS once
-emailjs.init("YOUR_PUBLIC_KEY") // Replace with your actual public key
+emailjs.init("FLzqpb_gwBOafkf7W") // Replace with your actual public key
 
 export default function Contact() {
   const sectionRef = useRef(null)
@@ -26,13 +26,18 @@ export default function Contact() {
   })
 
   // Scroll animations
+  // Enhanced scroll animations
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"]
   })
 
-  const backgroundOpacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 0.05, 0.05, 0])
-  const backgroundX = useTransform(scrollYProgress, [0, 1], [-50, 50])
+  const backgroundOpacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 0.08, 0.08, 0])
+  const backgroundX = useTransform(scrollYProgress, [0, 1], [100, -100])
+  const backgroundScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.8, 1, 1.2])
+  const backgroundRotate = useTransform(scrollYProgress, [0, 1], [-5, 5])
+  const backgroundY = useTransform(scrollYProgress, [0, 0.5, 1], [-50, 0, 50])
+  const letterSpacing = useTransform(scrollYProgress, [0, 0.5, 1], ["0px", "15px", "0px"])
 
   // Contact info animations
   const [ref, inView] = useInView({
@@ -120,8 +125,8 @@ export default function Contact() {
 
     try {
       await emailjs.send(
-        "service_xxxxxx",  // Replace with your actual service ID
-        "template_xxxxxx", // Replace with your actual template ID
+        "service_5nrs73a",  // Replace with your actual service ID
+        "template_0h8h2wr", // Replace with your actual template ID
         formData
       )
 
@@ -140,13 +145,17 @@ export default function Contact() {
     <section 
       ref={sectionRef}
       id="contact" 
-      className="min-h-screen relative py-32 bg-black/95"
+      className="min-h-screen relative py-32 bg-gradient-to-b from-black/95 to-black/90"
     >
       <motion.div 
-        className="frame-text absolute top-20 -left-20 text-[12rem] md:text-[16rem] font-bold z-0"
+        className="frame-text absolute top-20 -left-20 text-[12rem] md:text-[16rem] font-bold opacity-0"
         style={{ 
           opacity: backgroundOpacity,
-          x: backgroundX
+          x: backgroundX,
+          scale: backgroundScale,
+          rotate: backgroundRotate,
+          y: backgroundY,
+          letterSpacing
         }}
       >
         CONTACT
